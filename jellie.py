@@ -10,6 +10,7 @@ class JellieClient(discord.Client):
         super().__init__(*args, **kwargs)
 
         self.current_locations = set()
+        self.startup = True
         self.bg_task = self.loop.create_task(self.refresh_info())
 
     async def on_ready(self):
@@ -19,12 +20,16 @@ class JellieClient(discord.Client):
         await self.wait_until_ready()
         while not self.is_closed():
             await self.get_new_data()
+            self.startup = False
             await asyncio.sleep(jellieconfig.interval*60)
 
     async def notify(self, locations):
         channel = self.get_channel(jellieconfig.channel_id)
         if locations:
-            await channel.send('@everyone neue Termine:\n' + '\n'.join(locations))
+            message = '@everyone neue Termine:\n' + '\n'.join(locations)
+            if startup:
+                message = 'vielleicht nicht ganz so neue Termine:\n' + '\n'.join(locations)
+            await channel.send(message)
         else:
             await channel.send('nichts neues...')
 
