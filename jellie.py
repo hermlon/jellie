@@ -3,6 +3,7 @@ import jellieconfig
 import asyncio
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 class JellieClient(discord.Client):
 
@@ -30,8 +31,9 @@ class JellieClient(discord.Client):
             if startup:
                 message = 'vielleicht nicht ganz so neue Termine:\n' + '\n'.join(locations)
             await channel.send(message)
-        else:
-            await channel.send('nichts neues...')
+        # update bot status
+        timestring = datetime.now().strftime("(%a - %H:%M)") 
+        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=timestring))
 
     async def get_new_data(self):
         page = requests.get(jellieconfig.url)
