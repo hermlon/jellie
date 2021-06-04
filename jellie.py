@@ -27,7 +27,7 @@ class JellieClient(discord.Client):
     async def notify(self, locations):
         channel = self.get_channel(jellieconfig.channel_id)
         if locations:
-            message = '@everyone neue Termine:\n' + '\n'.join(locations)
+            message = 'neue Termine:\n' + '\n'.join(locations)
             if self.startup:
                 message = 'vielleicht nicht ganz so neue Termine:\n' + '\n'.join(locations)
             await channel.send(message)
