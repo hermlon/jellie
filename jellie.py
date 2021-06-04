@@ -28,12 +28,13 @@ class JellieClient(discord.Client):
         channel = self.get_channel(jellieconfig.channel_id)
         if locations:
             message = '@everyone neue Termine:\n' + '\n'.join(locations)
-            if startup:
+            if self.startup:
                 message = 'vielleicht nicht ganz so neue Termine:\n' + '\n'.join(locations)
             await channel.send(message)
         # update bot status
-        timestring = datetime.now().strftime("(%a - %H:%M)") 
-        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=timestring))
+        timestring = datetime.now().strftime("%a - %H:%M") 
+        print("Last update: {}".format(timestring))
+        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="({})".format(timestring)))
 
     async def get_new_data(self):
         page = requests.get(jellieconfig.url)
