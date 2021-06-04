@@ -25,12 +25,16 @@ class JellieClient(discord.Client):
             await asyncio.sleep(jellieconfig.interval*60)
 
     async def notify(self, locations):
-        channel = self.get_channel(jellieconfig.channel_id)
         if locations:
             message = 'neue Termine:\n' + '\n'.join(locations)
             if self.startup:
                 message = 'vielleicht nicht ganz so neue Termine:\n' + '\n'.join(locations)
-            await channel.send(message)
+
+            for channel_id in jellieconfig.channels:
+                channel = self.get_channel(channel_id)
+                if channel:
+                    await channel.send(message)
+
         # update bot status
         timestring = datetime.now().strftime("%a - %H:%M") 
         print("Last update: {}".format(timestring))
