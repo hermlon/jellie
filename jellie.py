@@ -52,7 +52,7 @@ class JellieClient(discord.Client):
         await self.process_locations(locations) 
 
     def matches_town(self, location):
-        return jellieconfig.location in location
+        return any([loc in location for loc in jellieconfig.matches])
 
     async def process_locations(self, locations):
         new_loc = set()
