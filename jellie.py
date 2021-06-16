@@ -1,3 +1,4 @@
+import logging
 import discord
 import jellieconfig
 import asyncio
@@ -7,12 +8,19 @@ from datetime import datetime
 
 class JellieClient(discord.Client):
 
+    def handle_task_result(self, task):
+        try:
+            task.result()
+        except Exception:
+            logging.exception(task)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.current_locations = set()
         self.startup = True
         self.bg_task = self.loop.create_task(self.refresh_info())
+        self.bg_task.add_done_callback(self.handle_task_result)
 
     async def on_ready(self):
         print('i\'m readyy')
@@ -77,6 +85,8 @@ class JellieClient(discord.Client):
         self.current_locations = new_loc
         await self.notify(notify_loc)
 
+
+logging.basicConfig(level=logging.ERROR)
 
 client = JellieClient()
 client.run(jellieconfig.token)
