@@ -26,14 +26,26 @@ class JellieClient(discord.Client):
 
     async def notify(self, locations):
         if locations:
-            message = 'neue Termine:\n' + '\n'.join(locations)
+            message_str = '*neue Termine:*\n' + '\n'.join(locations)
             if self.startup:
-                message = 'vielleicht nicht ganz so neue Termine:\n' + '\n'.join(locations)
+                message_str = '*vielleicht nicht ganz so neue Termine:*\n' + '\n'.join(locations)
 
-            for channel_id in jellieconfig.channels:
-                channel = self.get_channel(channel_id)
-                if channel:
-                    await channel.send(message)
+            # check if above character limit
+            if len(message_str) >= 2000:
+                message_str = message_str[:-1000] + '...\n*und mehr...*'
+
+            for channel in jellieconfig.channels:
+                c = self.get_channel(channel['channel_id'])
+                if c:
+                    print(message_str)
+                    message = await c.send(message_str)
+                    if channel['publish']:
+                        try:
+                            await message.publish()
+                        except discord.errors.HTTPException:
+                            # rate limit is 10 per hour
+                            print("publishing message failed due to rate limit")
+
 
         # update bot status
         timestring = datetime.now().strftime("%a - %H:%M") 
