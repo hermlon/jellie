@@ -11,6 +11,8 @@ class JellieClient(discord.Client):
     def handle_task_result(self, task):
         try:
             task.result()
+        except asyncio.CancelledError:
+            pass
         except Exception:
             logging.exception(task)
 
@@ -30,7 +32,7 @@ class JellieClient(discord.Client):
         while not self.is_closed():
             await self.get_new_data()
             self.startup = False
-            await asyncio.sleep(jellieconfig.interval*60)
+            await asyncio.sleep(jellieconfig.interval)#change to 60
 
     async def notify(self, locations):
         if locations:
@@ -61,15 +63,18 @@ class JellieClient(discord.Client):
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="({})".format(timestring)))
 
     async def get_new_data(self):
-        page = requests.get(jellieconfig.url)
-        soup = BeautifulSoup(page.text, 'html.parser')
+        try:
+            page = requests.get(jellieconfig.url)
+            soup = BeautifulSoup(page.text, 'html.parser')
 
-        options = soup.find(id='select-ort-pub').find_all('option')[1:]
+            options = soup.find(id='select-ort-pub').find_all('option')[1:]
 
-        locations = set()
-        for option in options:
-            locations.add(option.string)
-        await self.process_locations(locations) 
+            locations = set()
+            for option in options:
+                locations.add(option.string)
+            await self.process_locations(locations)
+        except requests.exceptions.ConnectionError as e:
+            print("No internet connection")
 
     def matches_town(self, location):
         return any([loc in location for loc in jellieconfig.matches])
