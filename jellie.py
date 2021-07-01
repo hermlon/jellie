@@ -32,7 +32,7 @@ class JellieClient(discord.Client):
         while not self.is_closed():
             await self.get_new_data()
             self.startup = False
-            await asyncio.sleep(jellieconfig.interval)#change to 60
+            await asyncio.sleep(jellieconfig.interval*60)
 
     async def notify(self, locations):
         if locations:
