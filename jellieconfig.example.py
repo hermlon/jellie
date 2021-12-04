@@ -1,11 +1,11 @@
 token = ''
 channels = [
         {
-            "channel_id": 13453531,
+            "channel_id": 325325325,
             "publish": True
         }
 ]
-url = 'https://www.impfen-thueringen.de/terminvergabe/index.php'
-matches = ['Jena', 'Erfurt']
+url = 'https://www.impfen-thueringen.de/terminvergabe/func.php'
+matches = ['Jena']
 # in minutes
-interval = 120
+interval = 15
