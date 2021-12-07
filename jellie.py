@@ -64,14 +64,17 @@ class JellieClient(discord.Client):
             c = self.get_channel(channel['channel_id'])
             if c:
                 print(message_str)
-                message = await c.send(message_str)
-                if channel['publish']:
-                    try:
-                        await message.publish()
-                    except discord.errors.HTTPException:
-                        # rate limit is 10 per hour
-                        print("publishing message failed due to rate limit")
-
+                try:
+                    message = await c.send(message_str)
+                    if channel['publish']:
+                        try:
+                            await message.publish()
+                        except discord.errors.HTTPException:
+                            # rate limit is 10 per hour
+                            print("publishing message failed due to rate limit")
+                except discord.errors.Forbidden:
+                    print("sending message failed for channel {}. Missing permissions?".format(str(c)))
+                
     async def update_status(self, message):
         # update bot status
         timestring = datetime.now().strftime("%a - %H:%M") 
